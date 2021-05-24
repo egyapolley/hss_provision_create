@@ -8,7 +8,7 @@ const db_pass=process.env.DB_PASS
 
 const sequelize = new Sequelize(db_name,db_user, db_pass,{
     dialect:"mysql",
-    host:"172.25.33.141",
+    host:"localhost",
 
     define: {
         freezeTableName:true

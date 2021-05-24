@@ -49,11 +49,12 @@ sequelize.sync({
             let [msisdn,iccid,imsi,authKeys] = tempArray
             let profileID = iccid.toString().substring(12)
             try {
-                if (await createAuthKeys(imsi, authKeys)) {
+                if (await createAuthKeys(imsi, authKeys,msisdn)) {
                     if (await createSubDetails(profileID, msisdn, imsi)) {
                         console.log(`${msisdn} successfully created on HSS`)
                         counter++
                         await VodafoneAccts.create({
+                            imsi,
                             iccid,
                             msisdn,
                             authKeys,
@@ -66,7 +67,7 @@ sequelize.sync({
                 }
             } catch (exp) {
                 console.log(`Error in creating ${msisdn} in HSS`)
-                throw exp
+                console.log(exp)
             }
 
         }
@@ -88,7 +89,7 @@ sequelize.sync({
 })
 
 
-async function createAuthKeys(imsi, authkeys) {
+async function createAuthKeys(imsi, authkeys,msisdn) {
     let msin = imsi.toString().substring(5);
     const sampleHeaders = {
         'Content-Type': 'text/xml; charset=utf-8',
@@ -128,12 +129,17 @@ async function createAuthKeys(imsi, authkeys) {
    </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
 
-    const {response} = await soapRequest({url: URL, headers: sampleHeaders, xml: xmlRequest, timeout: 6000}); // Optional timeout parameter(milliseconds)
-    const {body} = response;
-    let jsonObj = parser.parse(body, options);
-    let result = jsonObj.Envelope.Body;
-    console.log(result);
-    return  !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
+    try {
+        const {response} = await soapRequest({url: URL, headers: sampleHeaders, xml: xmlRequest, timeout: 6000}); // Optional timeout parameter(milliseconds)
+        const {body} = response;
+        let jsonObj = parser.parse(body, options);
+        let result = jsonObj.Envelope.Body;
+        console.log(result);
+        return !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
+    } catch (e) {
+        console.log("Error in creating AUC ",msisdn)
+        throw e
+    }
 
 }
 async function createSubDetails(profileId, msisdn,imsi) {
@@ -215,12 +221,17 @@ async function createSubDetails(profileId, msisdn,imsi) {
    </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
 
-    const {response} = await soapRequest({url: URL, headers: sampleHeaders, xml: xmlRequest, timeout: 6000}); // Optional timeout parameter(milliseconds)
-    const {body} = response;
-    let jsonObj = parser.parse(body, options);
-    let result = jsonObj.Envelope.Body;
-    console.log(result);
-    return  !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
+    try {
+        const {response} = await soapRequest({url: URL, headers: sampleHeaders, xml: xmlRequest, timeout: 6000}); // Optional timeout parameter(milliseconds)
+        const {body} = response;
+        let jsonObj = parser.parse(body, options);
+        let result = jsonObj.Envelope.Body;
+        console.log(result);
+        return !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
+    } catch (e) {
+        console.log("Error in creating HSS Sub ",msisdn)
+        throw e
+    }
 
 }
 
