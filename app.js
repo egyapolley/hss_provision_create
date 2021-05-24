@@ -134,7 +134,6 @@ async function createAuthKeys(imsi, authkeys,msisdn) {
         const {body} = response;
         let jsonObj = parser.parse(body, options);
         let result = jsonObj.Envelope.Body;
-        console.log(result);
         return !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
     } catch (e) {
         console.log("Error in creating AUC ",msisdn)
@@ -226,7 +225,6 @@ async function createSubDetails(profileId, msisdn,imsi) {
         const {body} = response;
         let jsonObj = parser.parse(body, options);
         let result = jsonObj.Envelope.Body;
-        console.log(result);
         return !!(result.createMOResponse && result.createMOResponse.mO && result.createMOResponse.mO.moiLocation);
     } catch (e) {
         console.log("Error in creating HSS Sub ",msisdn)
