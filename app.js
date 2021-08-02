@@ -144,6 +144,7 @@ async function createAuthKeys(imsi, authkeys,msisdn) {
 async function createSubDetails(profileId, msisdn,imsi) {
     let msin = imsi.toString().substring(5);
     let missdn_temp = msisdn.toString().substring(5)
+    let msisdn_temp2 = msisdn.toString().substring(3,5)
     const sampleHeaders = {
         'Content-Type': 'text/xml; charset=utf-8',
         'SOAPAction': '',
@@ -172,7 +173,7 @@ async function createSubDetails(profileId, msisdn,imsi) {
                </mO:moAttribute>
                <mO:moAttribute>
                   <mO:name>MainSNwithBearerService</mO:name>
-                  <mO:value>233-30-${missdn_temp}:GPRS</mO:value>
+                  <mO:value>233-${msisdn_temp2}-${missdn_temp}:GPRS</mO:value>
                </mO:moAttribute>
                <mO:moAttribute>
                   <mO:name>networkAccessMode</mO:name>
